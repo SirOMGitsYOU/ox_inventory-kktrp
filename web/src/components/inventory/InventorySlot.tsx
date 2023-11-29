@@ -152,7 +152,7 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
           }}
         >
           <div
-            className={`px-1 pt-1 flex items-center justify-between flex-wrap gap-1`}
+            className={`px-1 pt-1 flex items-start justify-between flex-wrap gap-1`}
           >
             {item.weight > 0 && (
               <span className='inventory-weight'>
@@ -169,11 +169,47 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
               </span>
             )}
 
-            {item.count && (
-              <span className={`inventory-weight ${item.name == 'money' ? 'inventory-weight--money' : 'inventory-weight--amount'}`}>
-                {item.count.toLocaleString('en-us') + ` ${item.name == 'money' ? '$' : 'x'}`}
-              </span>
-            )}
+            <div className="flex flex-col items-end gap-1">
+              {inventoryType === 'shop' && item?.price !== undefined && (
+                <>
+                  {item?.currency !== 'money' && item.currency !== 'black_money' && item.price > 0 && item.currency ? (
+                    <div className="item-slot-currency-wrapper">
+                      <img
+                        src={item.currency ? getItemUrl(item.currency) : 'none'}
+                        alt="item-image"
+                        style={{
+                          imageRendering: '-webkit-optimize-contrast',
+                          height: 'auto',
+                          width: '2vh',
+                          backfaceVisibility: 'hidden',
+                          transform: 'translateZ(0)',
+                        }}
+                      />
+                      <p>{item.price.toLocaleString('en-us')}</p>
+                    </div>
+                  ) : (
+                    <>
+                      {item.price > 0 && (
+                        <div
+                          className={`item-slot-price-wrapper ${item.currency === 'money' || !item.currency ? 'text-green-400' : 'text-red-400'}`}
+                        >
+                          <p>
+                            {Locale.$ || '$'}
+                            {item.price.toLocaleString('en-us')}
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+
+              {item.count && (
+                <span className={`inventory-weight ${item.name == 'money' ? 'inventory-weight--money' : 'inventory-weight--amount'}`}>
+                  {item.count.toLocaleString('en-us') + ` ${item.name == 'money' ? '$' : 'x'}`}
+                </span>
+              )}
+            </div>
           </div>
 
           <div>
@@ -184,40 +220,6 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
                 </div>
               </div>
             </div>
-
-            {inventoryType === 'shop' && item?.price !== undefined && (
-              <>
-                {item?.currency !== 'money' && item.currency !== 'black_money' && item.price > 0 && item.currency ? (
-                  <div className="item-slot-currency-wrapper">
-                    <img
-                      src={item.currency ? getItemUrl(item.currency) : 'none'}
-                      alt="item-image"
-                      style={{
-                        imageRendering: '-webkit-optimize-contrast',
-                        height: 'auto',
-                        width: '2vh',
-                        backfaceVisibility: 'hidden',
-                        transform: 'translateZ(0)',
-                      }}
-                    />
-                    <p>{item.price.toLocaleString('en-us')}</p>
-                  </div>
-                ) : (
-                  <>
-                    {item.price > 0 && (
-                      <div
-                        className={`item-slot-price-wrapper ${item.currency === 'money' || !item.currency ? 'text-green-400' : 'text-red-400'}`}
-                      >
-                        <p>
-                          {Locale.$ || '$'}
-                          {item.price.toLocaleString('en-us')}
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
 
             {inventoryType !== 'shop' && item?.durability !== undefined && (
               <WeightBar percent={item.durability} durability />
